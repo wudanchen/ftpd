@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(FTPD VERSION 0.1.0)
-
+add_definitions(-std=c++11)
+link_libraries(ACE pthread)
 add_executable(ftpserver main.cpp ftpserver.cpp)
