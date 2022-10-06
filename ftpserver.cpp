@@ -5,33 +5,32 @@
 #include <ace/SOCK_Acceptor.h>
 #include <ace/Log_Msg.h>
 
-
-class Read_Event_Handler : public ACE_Event_Handler {
+class Client_Event_Handler : public ACE_Event_Handler {
 public:
-    Read_Event_Handler();
-    ~Read_Event_Handler();
+    Client_Event_Handler();
+    ~Client_Event_Handler();
     int handle_input (ACE_HANDLE fd = ACE_INVALID_HANDLE) override;
+    int handle_output (ACE_HANDLE fd = ACE_INVALID_HANDLE) override;
     int handle_close (ACE_HANDLE handle, ACE_Reactor_Mask close_mask) override;
     ACE_HANDLE get_handle (void) const override;
 
     inline ACE_SOCK_Stream &peer() { return peer_; }
 
 private:
-
     ACE_SOCK_Stream peer_;
 };
 
-Read_Event_Handler::Read_Event_Handler()
+Client_Event_Handler::Client_Event_Handler()
 {
 
 }
 
-Read_Event_Handler::~Read_Event_Handler()
+Client_Event_Handler::~Client_Event_Handler()
 {
 
 }
 
-int Read_Event_Handler::handle_input(ACE_HANDLE fd)
+int Client_Event_Handler::handle_input(ACE_HANDLE fd)
 {
     char buf[1024] = {0};
     ssize_t ret = peer_.recv(buf, sizeof(buf));
@@ -46,11 +45,20 @@ int Read_Event_Handler::handle_input(ACE_HANDLE fd)
         return -1;
     }else {
         ACE_DEBUG((LM_DEBUG, "data : %s\n", buf));
+        ACE_Reactor::instance()->mask_ops(get_handle(), WRITE_MASK, ACE_Reactor::ADD_MASK);
         return 0;
     }
 }
 
-int Read_Event_Handler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask)
+int Client_Event_Handler::handle_output(ACE_HANDLE fd)
+{
+    ACE_DEBUG((LM_DEBUG, "current function : Read_Event_Handler::handle_output, handle : %d\n start", fd));
+    peer_.send("abcdefg.\n", 20);
+    ACE_Reactor::instance()->cancel_wakeup(get_handle(), WRITE_MASK);
+    return 0;
+}
+
+int Client_Event_Handler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask)
 {
     ACE_DEBUG((LM_DEBUG, "current function : Read_Event_Handler::handle_close, handle : %d\n", handle));
     if(handle == -1) {
@@ -61,7 +69,7 @@ int Read_Event_Handler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_m
     return 0;
 }
 
-ACE_HANDLE Read_Event_Handler::get_handle(void) const
+ACE_HANDLE Client_Event_Handler::get_handle(void) const
 {
     return peer_.get_handle();
 }
@@ -98,7 +106,7 @@ Accept_Event_Handler::~Accept_Event_Handler()
 int Accept_Event_Handler::handle_input(ACE_HANDLE fd)
 {
 
-    Read_Event_Handler *en = new Read_Event_Handler();
+    Client_Event_Handler *en = new Client_Event_Handler();
     if(acceptor_.accept(en->peer()) == -1) {
         ACE_DEBUG((LM_ERROR, "Error in conection.\n"));
         delete en;
