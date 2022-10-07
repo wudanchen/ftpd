@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.0.0)
+
+if(${CMAKE_BUILD_TYPE} MATCHES "Release")
+    message(STATUS "Release版本")
+    set(BuildType "Release")
+    set(CMAKE_C_FLAGS "$ENV{CFLAGS} -DNODEBUG -O3 -Wall")
+    set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -DNODEBUG -O3 -Wall")
+    message(STATUS "CXXFLAGS : " ${CMAKE_CXX_FLAGS})
+    message(STATUS "CFLAGS : " ${CMAKE_C_FLAGS})
+else()
+    set(BuildType "Debug")
+    message(STATUS "Debug版本")
+    set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -Wall  -O0 -g")
+    set(CMAKE_C_FLAGS "$ENV{CFLAGS} -O0 -g")
+    message(STATUS "CXXFLAGS: " ${CMAKE_CXX_FLAGS})
+    message(STATUS "CFLAGS: " ${CMAKE_C_FILAGS})
+endif()
+
+
+
+
+project(FTPD VERSION 0.1.0)
+add_definitions(-std=c++11)
+link_libraries(ACE pthread)
+add_executable(ftpserver main.cpp ftpserver.cpp)
