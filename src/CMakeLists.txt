@@ -16,10 +16,9 @@ else()
     message(STATUS "CFLAGS: " ${CMAKE_C_FILAGS})
 endif()
 
-
-
-
-project(FTPD VERSION 0.1.0)
+set(RELEASE_DIR ${PROJECT_SOURCE_DIR}/release)
+set(EXECUTABLE_OUTPUT_PATH ${RELEASE_DIR}/linux/${BuildType})
+add_compile_options(-fPIC)
 add_definitions(-std=c++11)
 link_libraries(ACE pthread)
 add_executable(ftpserver main.cpp ftpserver.cpp)
