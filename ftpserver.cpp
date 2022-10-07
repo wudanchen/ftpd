@@ -52,7 +52,7 @@ int Client_Event_Handler::handle_input(ACE_HANDLE fd)
 
 int Client_Event_Handler::handle_output(ACE_HANDLE fd)
 {
-    ACE_DEBUG((LM_DEBUG, "current function : Read_Event_Handler::handle_output, handle : %d\n start", fd));
+    ACE_DEBUG((LM_DEBUG, "Client_Event_Handler::handle_output\n"));
     peer_.send("abcdefg.\n", 20);
     ACE_Reactor::instance()->cancel_wakeup(get_handle(), WRITE_MASK);
     return 0;

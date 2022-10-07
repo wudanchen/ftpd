@@ -2,7 +2,7 @@
  * @Author: wdc 724214532@qq.com
  * @Date: 2022-10-01 17:35:28
  * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-06 15:00:11
+ * @LastEditTime: 2022-10-07 01:21:31
  * @FilePath: /ftpd/ftpserver.h
  * @Description: 
  * 
@@ -12,7 +12,6 @@
 #pragma once
 #include "threadpool.h"
 
-class Thread_Pool;
 class Ftp_Server {
 public:
     Ftp_Server(int port);
