@@ -1,9 +1,12 @@
 #include "ftpserver.h"
+#include "constants.h"
 
 #include <ace/Reactor.h>
 #include <ace/Event_Handler.h>
 #include <ace/SOCK_Acceptor.h>
 #include <ace/Log_Msg.h>
+
+#include <iostream>
 
 class Client_Event_Handler : public ACE_Event_Handler {
 public:
@@ -53,7 +56,7 @@ int Client_Event_Handler::handle_input(ACE_HANDLE fd)
 int Client_Event_Handler::handle_output(ACE_HANDLE fd)
 {
     ACE_DEBUG((LM_DEBUG, "Client_Event_Handler::handle_output\n"));
-    peer_.send("abcdefg.\n", 20);
+    peer_.send((const char *)msg_new_user, sizeof(msg_new_user));
     ACE_Reactor::instance()->cancel_wakeup(get_handle(), WRITE_MASK);
     return 0;
 }
@@ -76,23 +79,21 @@ ACE_HANDLE Client_Event_Handler::get_handle(void) const
 
 class Accept_Event_Handler : public ACE_Event_Handler {
 public:
-    explicit Accept_Event_Handler(int port);
+    Accept_Event_Handler();
+    ~Accept_Event_Handler();
     int handle_input (ACE_HANDLE fd = ACE_INVALID_HANDLE) override;
     int handle_close (ACE_HANDLE handle, ACE_Reactor_Mask close_mask) override;
     ACE_HANDLE get_handle (void) const override;
+    int open(int port);
 
 private:
-    ~Accept_Event_Handler();
-    void open(const ACE_Addr &addr);
     void close();
     
     ACE_SOCK_Acceptor acceptor_;
 };
 
-Accept_Event_Handler::Accept_Event_Handler(int port)
+Accept_Event_Handler::Accept_Event_Handler()
 {
-    ACE_INET_Addr addr(port);
-    this->open(addr);
 }
 
 Accept_Event_Handler::~Accept_Event_Handler()
@@ -113,7 +114,7 @@ int Accept_Event_Handler::handle_input(ACE_HANDLE fd)
         return 0;
     }
     ACE_DEBUG((LM_DEBUG, "connection established.\n"));
-    ACE_Reactor::instance()->register_handler(en, ACE_Event_Handler::READ_MASK);
+    ACE_Reactor::instance()->register_handler(en, READ_MASK | WRITE_MASK);
     return 0;
 }
 
@@ -121,6 +122,7 @@ int Accept_Event_Handler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close
 {
     ACE_DEBUG((LM_DEBUG, "current function : accept_event_handler::handle_close"));
     close();
+    return 0;
 }
 
 ACE_HANDLE Accept_Event_Handler::get_handle(void) const
@@ -128,9 +130,9 @@ ACE_HANDLE Accept_Event_Handler::get_handle(void) const
     return acceptor_.get_handle();
 }
 
-void Accept_Event_Handler::open(const ACE_Addr &addr)
+int Accept_Event_Handler::open(int port)
 {
-    acceptor_.open(addr);
+    return acceptor_.open(ACE_INET_Addr(port));
 }
 
 void Accept_Event_Handler::close()
@@ -153,7 +155,12 @@ Ftp_Server::~Ftp_Server()
 
 int Ftp_Server::run_loop()
 {
-    ACE_Event_Handler *accept_handler = new Accept_Event_Handler(port_);
+    Accept_Event_Handler *accept_handler = new Accept_Event_Handler();
+    if(accept_handler->open(port_) < 0) {
+        ACE_DEBUG((LM_DEBUG, "listren port %d connect failed.\n", port_));
+        delete accept_handler;
+        return -1;
+    }
     ACE_Reactor::instance()->register_handler(accept_handler, ACE_Event_Handler::ACCEPT_MASK);
     return ACE_Reactor::instance()->run_reactor_event_loop();
 }

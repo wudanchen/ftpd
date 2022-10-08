@@ -20,5 +20,5 @@ public:
 
 private:
     int port_;
-    Thread_Pool thread_pool_;
+    // Thread_Pool thread_pool_;
 };
