@@ -6,8 +6,6 @@
 #include <ace/SOCK_Acceptor.h>
 #include <ace/Log_Msg.h>
 
-#include <iostream>
-
 class Client_Event_Handler : public ACE_Event_Handler {
 public:
     Client_Event_Handler();
@@ -46,11 +44,10 @@ int Client_Event_Handler::handle_input(ACE_HANDLE fd)
     }else if (ret == 0) {
         ACE_DEBUG((LM_DEBUG, "connect closed.\n"));
         return -1;
-    }else {
-        ACE_DEBUG((LM_DEBUG, "data : %s\n", buf));
-        ACE_Reactor::instance()->mask_ops(get_handle(), WRITE_MASK, ACE_Reactor::ADD_MASK);
-        return 0;
     }
+    ACE_DEBUG((LM_DEBUG, "data : %s\n", buf));
+    ACE_Reactor::instance()->mask_ops(get_handle(), WRITE_MASK, ACE_Reactor::ADD_MASK);
+    return 0;
 }
 
 int Client_Event_Handler::handle_output(ACE_HANDLE fd)
