@@ -6,10 +6,10 @@
 #include <ace/SOCK_Acceptor.h>
 #include <ace/Log_Msg.h>
 
-class Data_Event_Handler : public ACE_Event_Handler {
+class Transfer_Event_Handler : public ACE_Event_Handler {
 public:
-    Data_Event_Handler();
-    ~Data_Event_Handler();
+    Transfer_Event_Handler();
+    ~Transfer_Event_Handler();
 private:
 
 };
