@@ -1,3 +1,13 @@
+/*
+ * @Author: wdc 724214532@qq.com
+ * @Date: 2022-10-09 14:08:37
+ * @LastEditors: wdc 724214532@qq.com
+ * @LastEditTime: 2022-10-09 16:46:33
+ * @FilePath: /ftpd/src/commandparser.cpp
+ * @Description: 
+ * 
+ * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
+ */
 #include "commandparser.h"
 #include "constants.h"
 
@@ -32,10 +42,9 @@ Command_Parser::Command_Parser()
 
 void Command_Parser::parsing_data(const char *buf, int len)
 {
-    const char *space_it = strchr(buf, ' ');
-    space_it = space_it == nullptr ? buf + strlen(buf) : space_it;
-    std::string command_str(buf, space_it);
-    ACE_DEBUG((LM_DEBUG, "command str : %s\n", command_str));
+    recv_buffer_handle(buf);
+    std::string command_str = recv_buffer_.front();
+    ACE_DEBUG((LM_DEBUG, "recv command str : %s\n", command_str));
     auto it = command_.find(command_str);
     if(it != command_.end()) {
         (this->*(it->second))();
@@ -49,9 +58,45 @@ const char *Command_Parser::response_data() const
     return send_buff_.data();
 }
 
+void Command_Parser::user_handle()
+{
+    if(recv_buffer_.at(1).empty()) {
+        send_buffer_handle(msg_login_fail);
+        return;
+    }
+    if(info_.check_logged_in(recv_buffer_.at(1))) {
+        send_buffer_handle(msg_login_success);
+    }else if(info_.check_user_name(recv_buffer_.at(1))) {
+        send_buffer_handle(msg_user_require_pass);
+    }else {
+        send_buffer_handle(msg_login_fail);
+    }
+}
+
+void Command_Parser::pass_handle()
+{
+    
+}
+
+void Command_Parser::pwd_handle()
+{
+    
+}
+
 void Command_Parser::cmd_not_implemented_handle()
 {
+    send_buffer_handle(msg_cmd_not_implemented);
+}
+
+void Command_Parser::recv_buffer_handle(const char *buff)
+{
+    recv_buffer_.clear();
+    
+}
+
+void Command_Parser::send_buffer_handle(const char *msg)
+{
     send_buff_.clear();
-    send_buff_.resize(sizeof(msg_cmd_not_implemented));
-    std::copy(send_buff_.begin(), send_buff_.end(), msg_cmd_not_implemented);
+    send_buff_.resize(strlen(msg) + 1);
+    std::copy(send_buff_.begin(), send_buff_.end(), msg);
 }

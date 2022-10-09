@@ -1,4 +1,15 @@
+/*
+ * @Author: wdc 724214532@qq.com
+ * @Date: 2022-10-09 15:01:45
+ * @LastEditors: wdc 724214532@qq.com
+ * @LastEditTime: 2022-10-09 16:30:54
+ * @FilePath: /ftpd/src/commandparser.h
+ * @Description: 
+ * 
+ * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
+ */
 #pragma once
+#include "serverinfo.h"
 
 #include <vector>
 #include <functional>
@@ -30,8 +41,11 @@ private:
     void mkd_handle();
     void quit_handle();
     void cmd_not_implemented_handle();
+    void recv_buffer_handle(const char *buff);
+    void send_buffer_handle(const char *msg);
 
     std::vector<char> send_buff_;
-    std::vector<char> recv_buff_;
+    std::vector<std::string> recv_buffer_;
     static std::map<std::string, void (Command_Parser::*)()> command_;
+    static Server_Info info_;
 };

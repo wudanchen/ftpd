@@ -2,8 +2,8 @@
  * @Author: wdc 724214532@qq.com
  * @Date: 2022-08-25 17:29:23
  * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-01 17:49:23
- * @FilePath: /ftpd/threadpool.h
+ * @LastEditTime: 2022-10-09 13:57:30
+ * @FilePath: /ftpd/src/threadpool.h
  * @Description: 
  * 
  * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
@@ -20,11 +20,11 @@
 
 class Thread_Pool {
 public:
-    explicit Thread_Pool(size_t threadCount = 8) 
-    : isclosed_(false)
-    {
-        init_thread(threadCount);
+    static Thread_Pool *instance() {
+        static Thread_Pool thread_pool;
+        return &thread_pool;
     }
+
     void add_task(const std::function<void()> &task) 
     {
         {
@@ -45,6 +45,12 @@ public:
 
 private:
 
+    explicit Thread_Pool(size_t threadCount = 8) 
+    : isclosed_(false)
+    {
+        init_thread(threadCount);
+    }
+    
     void init_thread(int threadCount = 8) 
     {
         for(int i = 0; i < threadCount; ++i) {

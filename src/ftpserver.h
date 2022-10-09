@@ -2,15 +2,14 @@
  * @Author: wdc 724214532@qq.com
  * @Date: 2022-10-01 17:35:28
  * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-07 01:49:42
- * @FilePath: /ftpd/ftpserver.h
+ * @LastEditTime: 2022-10-09 13:58:27
+ * @FilePath: /ftpd/src/ftpserver.h
  * @Description: 
  * 
  * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
  */
 
 #pragma once
-#include "threadpool.h"
 
 class Ftp_Server {
 public:
@@ -20,5 +19,4 @@ public:
 
 private:
     int port_;
-    // Thread_Pool thread_pool_;
 };
