@@ -2,7 +2,7 @@
  * @Author: wdc 724214532@qq.com
  * @Date: 2022-10-09 14:08:37
  * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-09 16:46:33
+ * @LastEditTime: 2022-10-10 15:52:34
  * @FilePath: /ftpd/src/commandparser.cpp
  * @Description: 
  * 
@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <pwd.h>
 #include <unistd.h>
+#include <sstream>
 
 Command_Parser::Command_Handle Command_Parser::command_ =
 {
@@ -124,7 +125,16 @@ void Command_Parser::cdup_handle(const std::vector<std::string> &recv_buffer)
 
 void Command_Parser::port_handle(const std::vector<std::string> &recv_buffer)
 {
-    cmd_not_implemented_handle();
+    std::vector<std::string> spilt_str = spilt(recv_buffer.at(1), ',');
+    if(spilt_str.size() != 6) {
+        send_buffer_handle(msg_syntax_error);
+        return;
+    }
+    std::string ip_str = spilt_str.at(0) + "." + spilt_str.at(1) + "." + spilt_str.at(2) + "." + spilt_str.at(3);
+    int p1 = atoi(spilt_str.at(4).c_str());
+    int p2 = atoi(spilt_str.at(5).c_str());
+    int port = p1 * 256 + p2;
+    
 }
 
 void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
@@ -206,4 +216,20 @@ void Command_Parser::recv_buffer_handle(const char *buff, std::vector<std::strin
 void Command_Parser::send_buffer_handle(const std::string &msg)
 {
     send_buff_.assign(msg);
+}
+
+std::vector<std::string> Command_Parser::spilt(const std::string &str, const char separator)
+{
+    std::vector<std::string> result_str;
+    auto pre_it = str.begin();
+    for(auto it = str.begin(); it != str.end(); ++it) {
+        if(*it == separator) {
+            result_str.push_back(std::string(pre_it, it));
+            pre_it = it + 1;
+        }
+    }
+    if(pre_it != str.end()) {
+        result_str.push_back(std::string(pre_it, str.end()));
+    }
+    return result_str;
 }

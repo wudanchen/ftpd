@@ -2,7 +2,7 @@
  * @Author: wdc 724214532@qq.com
  * @Date: 2022-10-09 15:01:45
  * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-09 16:30:54
+ * @LastEditTime: 2022-10-10 15:37:14
  * @FilePath: /ftpd/src/commandparser.h
  * @Description: 
  * 
@@ -46,7 +46,8 @@ private:
     void cmd_not_implemented_handle();
     void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer);
     void send_buffer_handle(const std::string &msg);
-
+    std::vector<std::string> spilt(const std::string &str, const char separator);
+    
     struct User_Info {
         std::string user;
         std::string current_dir;

@@ -65,7 +65,7 @@ int Client_Event_Handler::handle_input(ACE_HANDLE fd)
 int Client_Event_Handler::handle_output(ACE_HANDLE fd)
 {
     //发送数据处理
-    peer_.send(cmd_parser_.response_data(), strlen(cmd_parser_.response_data()));
+    peer_.send(cmd_parser_.response_data(), strlen(cmd_parser_.response_data()) + 1);
     ACE_Reactor::instance()->cancel_wakeup(get_handle(), WRITE_MASK);
     return 0;
 }

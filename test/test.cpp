@@ -24,8 +24,5 @@ void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer)
 }
 
 int main() {
-    char *login = getlogin();
-    cout << "login : " << login << endl;
-    passwd *wd = getpwnam(login);
-    cout << "wd : " << wd->pw_dir << endl;
+    getline()
 }
