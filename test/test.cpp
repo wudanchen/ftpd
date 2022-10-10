@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 
+#include <pwd.h>
+#include <unistd.h>
+
 using namespace std;
 
 void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer)
@@ -21,9 +24,8 @@ void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer)
 }
 
 int main() {
-    std::vector<std::string> recv_buffer;
-    recv_buffer_handle("user wdc\r\n", recv_buffer);
-    for (auto it = recv_buffer.begin(); it != recv_buffer.end(); ++it) {
-        cout << *it << endl;
-    }
+    char *login = getlogin();
+    cout << "login : " << login << endl;
+    passwd *wd = getpwnam(login);
+    cout << "wd : " << wd->pw_dir << endl;
 }

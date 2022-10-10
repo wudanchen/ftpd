@@ -15,6 +15,7 @@
 #include <functional>
 #include <map>
 
+
 class Command_Parser {
 public:
     typedef std::map<std::string, void (Command_Parser::*)(const std::vector<std::string> &)> Command_Handle;
@@ -44,10 +45,17 @@ private:
     void quit_handle(const std::vector<std::string> &recv_buffer);
     void cmd_not_implemented_handle();
     void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer);
-    void send_buffer_handle(const char *msg);
+    void send_buffer_handle(const std::string &msg);
+
+    struct User_Info {
+        std::string user;
+        std::string current_dir;
+        bool status;
+        User_Info() : user(""), current_dir(""), status(false) {}
+    };
 
     std::string send_buff_;
-    std::string confirm_user_;
+    User_Info user_info_;
     static Command_Handle command_;
     static Server_Info info_;
 };
