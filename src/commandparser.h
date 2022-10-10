@@ -17,35 +17,36 @@
 
 class Command_Parser {
 public:
+    typedef std::map<std::string, void (Command_Parser::*)(const std::vector<std::string> &)> Command_Handle;
+
     Command_Parser();
     ~Command_Parser() {}
     void parsing_data(const char *buf, int len);
     const char *response_data() const;
 
 private:
-    void user_handle();
-    void pass_handle();
-    void pwd_handle();
-    void cwd_handle();
-    void cdup_handle();
-    void port_handle();
-    void retr_handle();
-    void list_handle();
-    void type_handle();
-    void stor_handle();
-    void pasv_handle();
-    void rnfr_handle();
-    void rnto_handle();
-    void rmd_handle();
-    void dele_handle();
-    void mkd_handle();
-    void quit_handle();
+    void user_handle(const std::vector<std::string> &recv_buffer);
+    void pass_handle(const std::vector<std::string> &recv_buffer);
+    void pwd_handle(const std::vector<std::string> &recv_buffer);
+    void cwd_handle(const std::vector<std::string> &recv_buffer);
+    void cdup_handle(const std::vector<std::string> &recv_buffer);
+    void port_handle(const std::vector<std::string> &recv_buffer);
+    void retr_handle(const std::vector<std::string> &recv_buffer);
+    void list_handle(const std::vector<std::string> &recv_buffer);
+    void type_handle(const std::vector<std::string> &recv_buffer);
+    void stor_handle(const std::vector<std::string> &recv_buffer);
+    void pasv_handle(const std::vector<std::string> &recv_buffer);
+    void rnfr_handle(const std::vector<std::string> &recv_buffer);
+    void rnto_handle(const std::vector<std::string> &recv_buffer);
+    void rmd_handle(const std::vector<std::string> &recv_buffer);
+    void dele_handle(const std::vector<std::string> &recv_buffer);
+    void mkd_handle(const std::vector<std::string> &recv_buffer);
+    void quit_handle(const std::vector<std::string> &recv_buffer);
     void cmd_not_implemented_handle();
-    void recv_buffer_handle(const char *buff);
+    void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer);
     void send_buffer_handle(const char *msg);
 
     std::vector<char> send_buff_;
-    std::vector<std::string> recv_buffer_;
-    static std::map<std::string, void (Command_Parser::*)()> command_;
+    static Command_Handle command_;
     static Server_Info info_;
 };

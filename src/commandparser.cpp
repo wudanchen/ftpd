@@ -15,7 +15,7 @@
 #include <cstring>
 #include <algorithm>
 
-std::map<std::string, void (Command_Parser::*)()> Command_Parser::command_ =
+Command_Parser::Command_Handle Command_Parser::command_ =
 {
     { "USER", &Command_Parser::user_handle },
     { "PASS", &Command_Parser::pass_handle },
@@ -42,12 +42,13 @@ Command_Parser::Command_Parser()
 
 void Command_Parser::parsing_data(const char *buf, int len)
 {
-    recv_buffer_handle(buf);
-    std::string command_str = recv_buffer_.front();
+    std::vector<std::string> recv_buffer = {0};
+    recv_buffer_handle(buf, recv_buffer);
+    std::string command_str = recv_buffer.front();
     ACE_DEBUG((LM_DEBUG, "recv command str : %s\n", command_str));
     auto it = command_.find(command_str);
     if(it != command_.end()) {
-        (this->*(it->second))();
+        (this->*(it->second))(recv_buffer);
     }else {
         cmd_not_implemented_handle();
     }
@@ -58,27 +59,27 @@ const char *Command_Parser::response_data() const
     return send_buff_.data();
 }
 
-void Command_Parser::user_handle()
+void Command_Parser::user_handle(const std::vector<std::string> &recv_buffer)
 {
-    if(recv_buffer_.at(1).empty()) {
+    if(recv_buffer.at(1).empty()) {
         send_buffer_handle(msg_login_fail);
         return;
     }
-    if(info_.check_logged_in(recv_buffer_.at(1))) {
+    if(info_.check_logged_in(recv_buffer.at(1))) {
         send_buffer_handle(msg_login_success);
-    }else if(info_.check_user_name(recv_buffer_.at(1))) {
+    }else if(info_.check_user_name(recv_buffer.at(1))) {
         send_buffer_handle(msg_user_require_pass);
     }else {
         send_buffer_handle(msg_login_fail);
     }
 }
 
-void Command_Parser::pass_handle()
+void Command_Parser::pass_handle(const std::vector<std::string> &recv_buffer)
 {
     
 }
 
-void Command_Parser::pwd_handle()
+void Command_Parser::pwd_handle(const std::vector<std::string> &recv_buffer)
 {
     
 }
@@ -88,10 +89,9 @@ void Command_Parser::cmd_not_implemented_handle()
     send_buffer_handle(msg_cmd_not_implemented);
 }
 
-void Command_Parser::recv_buffer_handle(const char *buff)
+void Command_Parser::recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer)
 {
-    recv_buffer_.clear();
-    
+
 }
 
 void Command_Parser::send_buffer_handle(const char *msg)
