@@ -46,7 +46,8 @@ private:
     void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer);
     void send_buffer_handle(const char *msg);
 
-    std::vector<char> send_buff_;
+    std::string send_buff_;
+    std::string confirm_user_;
     static Command_Handle command_;
     static Server_Info info_;
 };

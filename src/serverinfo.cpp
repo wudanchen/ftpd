@@ -8,7 +8,7 @@ Server_Info::Server_Info()
         {"xiaoming",    "123456"},
         {"xiaobai",     "12456"},
         {"xiaohei",     "78906"},
-        {"anonymous",   ""}
+        // {"anonymous",   ""}
     };
 }
 
@@ -35,3 +35,15 @@ bool Server_Info::check_logged_in(const std::string &account)
     return true;
 }
 
+bool Server_Info::check_password(const std::string &user_name, const std::string &password)
+{
+    auto it = account_password_map_.find(user_name);
+    if(it == account_password_map_.end()) {
+        return false;
+    }
+    if(it->second == password) {
+        logged_account_.push_back(user_name);
+        return true;
+    }
+    return false;
+}

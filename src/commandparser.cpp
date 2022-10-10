@@ -36,16 +36,20 @@ Command_Parser::Command_Handle Command_Parser::command_ =
     { "MKD", &Command_Parser::mkd_handle }
 };
 
+Server_Info Command_Parser::info_;
+
 Command_Parser::Command_Parser()
+    : send_buff_(msg_new_user)
 {
 }
 
 void Command_Parser::parsing_data(const char *buf, int len)
 {
-    std::vector<std::string> recv_buffer = {0};
+    std::vector<std::string> recv_buffer;
     recv_buffer_handle(buf, recv_buffer);
     std::string command_str = recv_buffer.front();
-    ACE_DEBUG((LM_DEBUG, "recv command str : %s\n", command_str));
+    std::transform (command_str.begin (), command_str.end(), command_str.begin(), ::toupper);
+    ACE_DEBUG((LM_DEBUG, "recv command str : %s\n", command_str.data()));
     auto it = command_.find(command_str);
     if(it != command_.end()) {
         (this->*(it->second))(recv_buffer);
@@ -61,13 +65,14 @@ const char *Command_Parser::response_data() const
 
 void Command_Parser::user_handle(const std::vector<std::string> &recv_buffer)
 {
-    if(recv_buffer.at(1).empty()) {
+    if(recv_buffer.size() != 2) {
         send_buffer_handle(msg_login_fail);
         return;
     }
     if(info_.check_logged_in(recv_buffer.at(1))) {
         send_buffer_handle(msg_login_success);
     }else if(info_.check_user_name(recv_buffer.at(1))) {
+        confirm_user_ = recv_buffer.at(1);
         send_buffer_handle(msg_user_require_pass);
     }else {
         send_buffer_handle(msg_login_fail);
@@ -76,12 +81,90 @@ void Command_Parser::user_handle(const std::vector<std::string> &recv_buffer)
 
 void Command_Parser::pass_handle(const std::vector<std::string> &recv_buffer)
 {
-    
+    if(recv_buffer.size() != 2) {
+        send_buffer_handle(msg_user_require_pass);
+        return;
+    }
+    if(info_.check_password(confirm_user_, recv_buffer.at(1))) {
+        send_buffer_handle(msg_login_success);
+    }else {
+        send_buffer_handle(msg_login_fail);
+    }
 }
 
 void Command_Parser::pwd_handle(const std::vector<std::string> &recv_buffer)
 {
-    
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::cwd_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::cdup_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::port_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::list_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::type_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::stor_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::pasv_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::rnfr_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::rnto_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::rmd_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::dele_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::mkd_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
+}
+
+void Command_Parser::quit_handle(const std::vector<std::string> &recv_buffer)
+{
+    cmd_not_implemented_handle();
 }
 
 void Command_Parser::cmd_not_implemented_handle()
@@ -91,12 +174,20 @@ void Command_Parser::cmd_not_implemented_handle()
 
 void Command_Parser::recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer)
 {
-
+    char *recv_buff = (char *)buff;
+    auto *pre_it = recv_buff;
+    for(auto *it = recv_buff; *it != '\0'; ++it) {
+        if(*it == ' ') {
+            recv_buffer.push_back(std::string(pre_it, it));
+            pre_it = it + 1;
+        }else if(*it == '\r' || *it == '\n') {
+            if(pre_it != it) recv_buffer.push_back(std::string(pre_it, it));
+            break;
+        }
+    }
 }
 
 void Command_Parser::send_buffer_handle(const char *msg)
 {
-    send_buff_.clear();
-    send_buff_.resize(strlen(msg) + 1);
-    std::copy(send_buff_.begin(), send_buff_.end(), msg);
+    send_buff_.assign(msg);
 }

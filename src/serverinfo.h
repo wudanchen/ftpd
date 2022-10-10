@@ -20,7 +20,7 @@ public:
     ~Server_Info();
     bool check_logged_in(const std::string &account);
     bool check_user_name(const std::string &user_name);
-
+    bool check_password(const std::string &user_name, const std::string &passward);
 private:
     std::map<std::string, std::string> account_password_map_;
     std::list<std::string> logged_account_;

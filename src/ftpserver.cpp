@@ -1,6 +1,6 @@
 #include "ftpserver.h"
 #include "commandparser.h"
-#include "threadpool.h"
+// #include "threadpool.h"
 
 #include <ace/Reactor.h>
 #include <ace/Event_Handler.h>
@@ -58,7 +58,7 @@ int Client_Event_Handler::handle_input(ACE_HANDLE fd)
     }
     //recv数据处理
     ACE_DEBUG((LM_DEBUG, "data : %s\n", buf));
-    cmd_parser_.parsing_data(buf, sizeof(buf));
+    cmd_parser_.parsing_data(buf, ret);
     ACE_Reactor::instance()->mask_ops(get_handle(), WRITE_MASK, ACE_Reactor::ADD_MASK);
     ACE_DEBUG((LM_DEBUG, "============client input fd end: %d ============\n", fd));
     return 0;
@@ -68,7 +68,7 @@ int Client_Event_Handler::handle_output(ACE_HANDLE fd)
 {
     //发送数据处理
     ACE_DEBUG((LM_DEBUG, "============client output fd start: %d ============\n", fd));
-    peer_.send(cmd_parser_.response_data(), sizeof(cmd_parser_.response_data()));
+    peer_.send(cmd_parser_.response_data(), strlen(cmd_parser_.response_data()));
     ACE_Reactor::instance()->cancel_wakeup(get_handle(), WRITE_MASK);
     ACE_DEBUG((LM_DEBUG, "============client output fd end: %d ============\n", fd));
     return 0;
