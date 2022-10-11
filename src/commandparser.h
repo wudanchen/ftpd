@@ -49,10 +49,11 @@ private:
     std::vector<std::string> spilt(const std::string &str, const char separator);
     
     struct User_Info {
-        std::string user;
-        std::string current_dir;
-        bool status;
-        User_Info() : user(""), current_dir(""), status(false) {}
+        std::string user = "";
+        std::string current_dir = "";
+        std::string data_ip = "";
+        uint data_port = 20;
+        bool status = false;
     };
 
     std::string send_buff_;

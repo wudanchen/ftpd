@@ -10,7 +10,6 @@
  */
 #pragma once
 
-const char msg_common_success[]         =                         "200 Command okay\r\n";
 const char msg_pasv_success[]           =                         "227 Entering Passive Mode. (%s)\r\n";
 
 //已使用
@@ -23,3 +22,4 @@ const char msg_pwd_success[]            =                         "257 \"%s\" is
 const char msg_action_not_taken[]       =                         "550 Requested action not taken.\r\n";
 const char msg_file_success[]           =                         "250 Requested file action okay, completed\r\n";
 const char msg_syntax_error[]           =                         "501 Syntax error in parameters or arguments.\r\n";// (参数语法错误)
+const char msg_common_success[]         =                         "200 Command okay\r\n";

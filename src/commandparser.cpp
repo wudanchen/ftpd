@@ -130,11 +130,11 @@ void Command_Parser::port_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_syntax_error);
         return;
     }
-    std::string ip_str = spilt_str.at(0) + "." + spilt_str.at(1) + "." + spilt_str.at(2) + "." + spilt_str.at(3);
+    user_info_.data_ip = spilt_str.at(0) + "." + spilt_str.at(1) + "." + spilt_str.at(2) + "." + spilt_str.at(3);
     int p1 = atoi(spilt_str.at(4).c_str());
     int p2 = atoi(spilt_str.at(5).c_str());
-    int port = p1 * 256 + p2;
-    
+    user_info_.data_port = p1 * 256 + p2;
+    send_buffer_handle(msg_common_success);
 }
 
 void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
