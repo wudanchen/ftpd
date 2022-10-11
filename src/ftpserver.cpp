@@ -7,14 +7,6 @@
 #include <ace/SOCK_Acceptor.h>
 #include <ace/Log_Msg.h>
 
-class Transfer_Event_Handler : public ACE_Event_Handler {
-public:
-    Transfer_Event_Handler();
-    ~Transfer_Event_Handler();
-private:
-
-};
-
 class Client_Event_Handler : public ACE_Event_Handler {
 public:
     Client_Event_Handler();
