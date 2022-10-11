@@ -11,7 +11,8 @@ public:
     bool check_logged_in(const std::string &account);
     bool check_user_name(const std::string &user_name);
     bool check_password(const std::string &user_name, const std::string &passward);
-    
+    std::string get_dir_list(const std::string &path_name);
+
     inline void set_user(const std::string &user) { user_ = user; }
     inline void set_current_dir(const std::string &dir) { current_dir_ = dir; }
     inline void set_connect_ip(const std::string &ip) { data_connect_ip_ = ip; }

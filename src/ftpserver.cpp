@@ -19,13 +19,15 @@ public:
     inline ACE_SOCK_Stream &peer() { return peer_; }
 
 private:
+    void output_signal(const std::string &data);
+
     ACE_SOCK_Stream peer_;
     Command_Parser cmd_parser_;
 };
 
 Client_Event_Handler::Client_Event_Handler()
 {
-
+    cmd_parser_.set_callback(std::bind(&Client_Event_Handler::output_signal, this, std::placeholders::_1));
 }
 
 Client_Event_Handler::~Client_Event_Handler()
@@ -76,6 +78,12 @@ int Client_Event_Handler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close
 ACE_HANDLE Client_Event_Handler::get_handle(void) const
 {
     return peer_.get_handle();
+}
+
+void Client_Event_Handler::output_signal(const std::string &data)
+{
+    // ACE_Reactor::instance()->mask_ops(get_handle(), WRITE_MASK, ACE_Reactor::ADD_MASK);
+    peer_.send(data.c_str(), data.size());
 }
 
 class Accept_Event_Handler : public ACE_Event_Handler {

@@ -20,6 +20,5 @@ public:
 
 private:
     ACE_SOCK_Stream client_stream_;
-    ACE_INET_Addr remote_addr_;
     ACE_SOCK_Connector connector_;
 };

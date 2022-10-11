@@ -15,6 +15,7 @@
 #include <cstring>
 #include <algorithm>
 #include <sstream>
+#include <ace/Reactor.h>
 
 Command_Parser::Command_Handle Command_Parser::command_ =
 {
@@ -62,6 +63,12 @@ const char *Command_Parser::response_data() const
 {
     return send_buff_.data();
 }
+
+void Command_Parser::set_callback(const std::function<void(const std::string &)> &callback)
+{
+    output_signal_callback_ = callback;
+}
+
 
 void Command_Parser::user_handle(const std::vector<std::string> &recv_buffer)
 {
@@ -139,7 +146,17 @@ void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
 
 void Command_Parser::list_handle(const std::vector<std::string> &recv_buffer)
 {
-    cmd_not_implemented_handle();
+    Transmitter transmitter;
+    if (transmitter.connect(info_.connect_ip(), info_.connect_port()) == -1) {
+        send_buffer_handle(msg_connect_fail);
+        return;
+    }
+    send_buffer_handle(msg_stansfer_start, true);
+    std::string path_name = recv_buffer.size() == 2 ? recv_buffer.at(1) : "";
+    std::string dir_list = info_.get_dir_list(path_name);
+    int ret = transmitter.send(dir_list);
+    ACE_DEBUG((LM_DEBUG, "ret : %d\n", ret));
+    send_buffer_handle(msg_file_success);
 }
 
 void Command_Parser::type_handle(const std::vector<std::string> &recv_buffer)
@@ -208,9 +225,12 @@ void Command_Parser::recv_buffer_handle(const char *buff, std::vector<std::strin
     }
 }
 
-void Command_Parser::send_buffer_handle(const std::string &msg)
+void Command_Parser::send_buffer_handle(const std::string &msg, bool send_immediately)
 {
     send_buff_.assign(msg);
+    if(send_immediately) {
+        output_signal_callback_(send_buff_);
+    }
 }
 
 std::vector<std::string> Command_Parser::spilt(const std::string &str, const char separator)
