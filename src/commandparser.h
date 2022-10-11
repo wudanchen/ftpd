@@ -9,7 +9,7 @@
  * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
  */
 #pragma once
-#include "serverinfo.h"
+#include "userinfo.h"
 
 #include <vector>
 #include <functional>
@@ -47,17 +47,8 @@ private:
     void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer);
     void send_buffer_handle(const std::string &msg);
     std::vector<std::string> spilt(const std::string &str, const char separator);
-    
-    struct User_Info {
-        std::string user = "";
-        std::string current_dir = "";
-        std::string data_ip = "";
-        uint data_port = 20;
-        bool status = false;
-    };
 
     std::string send_buff_;
-    User_Info user_info_;
+    User_Info info_;
     static Command_Handle command_;
-    static Server_Info info_;
 };

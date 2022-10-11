@@ -14,8 +14,6 @@
 #include <ace/Log_Msg.h>
 #include <cstring>
 #include <algorithm>
-#include <pwd.h>
-#include <unistd.h>
 #include <sstream>
 
 Command_Parser::Command_Handle Command_Parser::command_ =
@@ -39,13 +37,10 @@ Command_Parser::Command_Handle Command_Parser::command_ =
     { "MKD", &Command_Parser::mkd_handle }
 };
 
-Server_Info Command_Parser::info_;
-
 Command_Parser::Command_Parser()
     : send_buff_(msg_new_user)
 {
-    passwd *pwd = getpwnam(getlogin());
-    user_info_.current_dir = pwd == nullptr ? "" : pwd->pw_dir;
+    
 }
 
 void Command_Parser::parsing_data(const char *buf, int len)
@@ -77,7 +72,7 @@ void Command_Parser::user_handle(const std::vector<std::string> &recv_buffer)
     if(info_.check_logged_in(recv_buffer.at(1))) {
         send_buffer_handle(msg_login_success);
     }else if(info_.check_user_name(recv_buffer.at(1))) {
-        user_info_.user = recv_buffer.at(1);
+        info_.set_user(recv_buffer.at(1));
         send_buffer_handle(msg_user_require_pass);
     }else {
         send_buffer_handle(msg_login_fail);
@@ -90,8 +85,8 @@ void Command_Parser::pass_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_user_require_pass);
         return;
     }
-    if(info_.check_password(user_info_.user, recv_buffer.at(1))) {
-        user_info_.status = true;
+    if(info_.check_password(info_.user(), recv_buffer.at(1))) {
+        info_.set_status(true);
         send_buffer_handle(msg_login_success);
     }else {
         send_buffer_handle(msg_login_fail);
@@ -100,12 +95,12 @@ void Command_Parser::pass_handle(const std::vector<std::string> &recv_buffer)
 
 void Command_Parser::pwd_handle(const std::vector<std::string> &recv_buffer)
 {
-    if(user_info_.current_dir.empty()) {
+    if(info_.current_dir().empty()) {
         send_buffer_handle(msg_action_not_taken);
         return;
     }
     char msg[512] = {0};
-    sprintf(msg, msg_pwd_success, user_info_.current_dir.c_str());
+    sprintf(msg, msg_pwd_success, info_.current_dir().c_str());
     send_buffer_handle(msg);
 }
 
@@ -130,10 +125,10 @@ void Command_Parser::port_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_syntax_error);
         return;
     }
-    user_info_.data_ip = spilt_str.at(0) + "." + spilt_str.at(1) + "." + spilt_str.at(2) + "." + spilt_str.at(3);
+    info_.set_connect_ip(spilt_str.at(0) + "." + spilt_str.at(1) + "." + spilt_str.at(2) + "." + spilt_str.at(3));
     int p1 = atoi(spilt_str.at(4).c_str());
     int p2 = atoi(spilt_str.at(5).c_str());
-    user_info_.data_port = p1 * 256 + p2;
+    info_.set_connect_port(p1 * 256 + p2);
     send_buffer_handle(msg_common_success);
 }
 
