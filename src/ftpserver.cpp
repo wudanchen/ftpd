@@ -39,7 +39,6 @@ int Client_Event_Handler::handle_input(ACE_HANDLE fd)
 {
     char buf[1024] = {0};
     ssize_t ret = peer_.recv(buf, sizeof(buf));
-    ACE_DEBUG((LM_DEBUG, "ret : %d\n", ret));
     if(ret < 0) {
         if(ACE_ERRNO_GET == EAGAIN || ACE_ERRNO_GET == EWOULDBLOCK) {
             return 0;

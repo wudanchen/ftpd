@@ -2,7 +2,7 @@
  * @Author: wdc 724214532@qq.com
  * @Date: 2022-10-09 14:08:37
  * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-10 15:52:34
+ * @LastEditTime: 2022-10-11 17:56:44
  * @FilePath: /ftpd/src/commandparser.cpp
  * @Description: 
  * 
@@ -50,7 +50,6 @@ void Command_Parser::parsing_data(const char *buf, int len)
     recv_buffer_handle(buf, recv_buffer);
     std::string command_str = recv_buffer.front();
     std::transform (command_str.begin (), command_str.end(), command_str.begin(), ::toupper);
-    ACE_DEBUG((LM_DEBUG, "recv command str : %s\n", command_str.data()));
     auto it = command_.find(command_str);
     if(it != command_.end()) {
         (this->*(it->second))(recv_buffer);
@@ -117,7 +116,8 @@ void Command_Parser::cwd_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_login_fail);
         return;
     }
-    cmd_not_implemented_handle();
+    info_.update_current_dir(recv_buffer.at(1));
+    send_buffer_handle(msg_file_success);
 }
 
 void Command_Parser::cdup_handle(const std::vector<std::string> &recv_buffer)
@@ -146,16 +146,19 @@ void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
 
 void Command_Parser::list_handle(const std::vector<std::string> &recv_buffer)
 {
+    std::string path_name = recv_buffer.size() == 2 ? recv_buffer.at(1) : "";
+    std::string dir_list = info_.get_dir_list(path_name);
+    if(dir_list.empty()) {
+        send_buffer_handle(msg_syntax_error);
+        return;
+    }
     Transmitter transmitter;
     if (transmitter.connect(info_.connect_ip(), info_.connect_port()) == -1) {
         send_buffer_handle(msg_connect_fail);
         return;
     }
     send_buffer_handle(msg_stansfer_start, true);
-    std::string path_name = recv_buffer.size() == 2 ? recv_buffer.at(1) : "";
-    std::string dir_list = info_.get_dir_list(path_name);
-    int ret = transmitter.send(dir_list);
-    ACE_DEBUG((LM_DEBUG, "ret : %d\n", ret));
+    transmitter.send(dir_list);
     send_buffer_handle(msg_file_success);
 }
 
