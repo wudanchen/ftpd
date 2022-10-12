@@ -52,5 +52,6 @@ private:
     std::string send_buff_;
     User_Info info_;
     std::function<void(const std::string &)> output_signal_callback_;
+    Transmitter transmitter_;
     static Command_Handle command_;
 };

@@ -28,14 +28,8 @@ Command_Parser::Command_Handle Command_Parser::command_ =
     { "PORT", &Command_Parser::port_handle },
     { "RETR", &Command_Parser::retr_handle },
     { "LIST", &Command_Parser::list_handle },
-    { "TYPE", &Command_Parser::type_handle },
     { "STOR", &Command_Parser::stor_handle },
-    { "PASV", &Command_Parser::pasv_handle },
-    { "RNFR", &Command_Parser::rnfr_handle },
-    { "RNTO", &Command_Parser::rnto_handle },
-    { "RMD", &Command_Parser::rmd_handle },
-    { "DELE", &Command_Parser::dele_handle },
-    { "MKD", &Command_Parser::mkd_handle }
+    { "PASV", &Command_Parser::pasv_handle }
 };
 
 Command_Parser::Command_Parser()
@@ -119,7 +113,7 @@ void Command_Parser::cwd_handle(const std::vector<std::string> &recv_buffer)
     info_.update_current_dir(recv_buffer.at(1));
     send_buffer_handle(msg_file_success);
 }
-
+//不实现命令
 void Command_Parser::cdup_handle(const std::vector<std::string> &recv_buffer)
 {
     cmd_not_implemented_handle();
@@ -136,12 +130,25 @@ void Command_Parser::port_handle(const std::vector<std::string> &recv_buffer)
     int p1 = atoi(spilt_str.at(4).c_str());
     int p2 = atoi(spilt_str.at(5).c_str());
     info_.set_connect_port(p1 * 256 + p2);
+    info_.set_mode(Transmitter::ACTIVE_MODE);
     send_buffer_handle(msg_common_success);
 }
 
-void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
+void Command_Parser::pasv_handle(const std::vector<std::string> &recv_buffer)
 {
-    cmd_not_implemented_handle();
+    send_buffer_handle(msg_cmd_not_implemented);
+    return;
+    if(transmitter_.open_listen() < 0) {
+        send_buffer_handle(msg_cmd_not_implemented);
+    }
+    std::string host = transmitter_.get_addr().get_host_name();
+    uint port = transmitter_.get_addr().get_port_number();
+    std::replace(host.begin(), host.end(), '.', ',');
+    std::string addr_str = host + "," + std::to_string(port / 256) + "," + std::to_string(port % 256);
+    char msg[512] = {0};
+    sprintf(msg, msg_pasv_success, addr_str.c_str());
+    info_.set_mode(Transmitter::PASSIVE_MODE);
+    send_buffer_handle(msg);
 }
 
 void Command_Parser::list_handle(const std::vector<std::string> &recv_buffer)
@@ -152,54 +159,49 @@ void Command_Parser::list_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_syntax_error);
         return;
     }
-    Transmitter transmitter;
-    if (transmitter.connect(info_.connect_ip(), info_.connect_port()) == -1) {
+    if (transmitter_.start(info_) == -1) {
         send_buffer_handle(msg_connect_fail);
         return;
     }
     send_buffer_handle(msg_stansfer_start, true);
-    transmitter.send(dir_list);
+    transmitter_.send(dir_list);
     send_buffer_handle(msg_file_success);
+    transmitter_.end();
 }
 
-void Command_Parser::type_handle(const std::vector<std::string> &recv_buffer)
+void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
 {
-    cmd_not_implemented_handle();
+    std::string data = info_.get_file_data(recv_buffer.at(1));
+    if(data.empty()) {
+        send_buffer_handle(msg_syntax_error);
+        return;
+    }
+    if(transmitter_.start(info_) == -1) {
+        send_buffer_handle(msg_connect_fail);
+        return;
+    }
+    send_buffer_handle(msg_stansfer_start, true);
+    transmitter_.send(data);
+    send_buffer_handle(msg_file_success);
+    transmitter_.end();
 }
 
 void Command_Parser::stor_handle(const std::vector<std::string> &recv_buffer)
 {
-    cmd_not_implemented_handle();
-}
-
-void Command_Parser::pasv_handle(const std::vector<std::string> &recv_buffer)
-{
-    cmd_not_implemented_handle();
-}
-
-void Command_Parser::rnfr_handle(const std::vector<std::string> &recv_buffer)
-{
-    cmd_not_implemented_handle();
-}
-
-void Command_Parser::rnto_handle(const std::vector<std::string> &recv_buffer)
-{
-    cmd_not_implemented_handle();
-}
-
-void Command_Parser::rmd_handle(const std::vector<std::string> &recv_buffer)
-{
-    cmd_not_implemented_handle();
-}
-
-void Command_Parser::dele_handle(const std::vector<std::string> &recv_buffer)
-{
-    cmd_not_implemented_handle();
-}
-
-void Command_Parser::mkd_handle(const std::vector<std::string> &recv_buffer)
-{
-    cmd_not_implemented_handle();
+    if(recv_buffer.size() != 2) {
+        send_buffer_handle(msg_syntax_error);
+        return;
+    }
+    if(transmitter_.start(info_) == -1) {
+        send_buffer_handle(msg_connect_fail);
+        return;
+    }
+    send_buffer_handle(msg_stansfer_start, true);
+    std::string msg("");
+    transmitter_.recv(msg);
+    info_.save_file(recv_buffer.at(1), msg);
+    send_buffer_handle(msg_file_success);
+    transmitter_.end();
 }
 
 void Command_Parser::quit_handle(const std::vector<std::string> &recv_buffer)

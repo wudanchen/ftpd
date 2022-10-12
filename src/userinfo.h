@@ -22,6 +22,8 @@ public:
     bool check_user_name(const std::string &user_name);
     bool check_password(const std::string &user_name, const std::string &passward);
     std::string get_dir_list(const std::string &path_name);
+    std::string get_file_data(const std::string &path_name);
+    bool save_file(const std::string &file_name, const std::string &data);
     void update_current_dir(const std::string &path_name);
 
     inline void set_user(const std::string &user) { user_ = user; }
@@ -29,12 +31,14 @@ public:
     inline void set_connect_ip(const std::string &ip) { data_connect_ip_ = ip; }
     inline void set_connect_port(uint port) { data_connect_port_ = port; }
     inline void set_status(bool status) { status_ = status; }
+    inline void set_mode(int mode) { mode_ = mode; }
 
     inline const std::string &user() const { return user_; }
     inline const std::string &current_dir() const { return current_dir_; }
     inline const std::string &connect_ip() const { return data_connect_ip_; }
     inline const uint connect_port() const { return data_connect_port_; }
     inline const bool status() const { return status_; }
+    inline const int mode() const { return mode_; }
 
 private:
     bool absolute_path(const std::string &path);
@@ -58,4 +62,5 @@ struct Server_Info {
     std::string data_connect_ip_;
     uint data_connect_port_;
     bool status_;
+    int mode_;
 };

@@ -11,6 +11,10 @@
 #include "userinfo.h"
 
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 #include <pwd.h>
 #include <unistd.h>
 #include <ace/Log_Msg.h>
@@ -142,6 +146,24 @@ std::string User_Info::get_dir_list(const std::string &path_name)
     }
     closedir(dir);
     return msg;
+}
+std::string User_Info::get_file_data(const std::string &path_name)
+{
+    std::string file_path = absolute_path(path_name) ? path_name : current_dir_ + "/" + path_name;
+    std::ifstream in(file_path);
+    std::ostringstream tmp;
+    tmp << in.rdbuf();
+    return tmp.str();
+}
+
+bool User_Info::save_file(const std::string &file_name, const std::string &data)
+{
+    std::ofstream fs;
+    std::string file_path = current_dir_ + "/" + file_name;
+    fs.open(file_path, ios::out);
+    fs.write(data.c_str(), data.size());
+    fs.close();
+    return true;
 }
 
 void User_Info::update_current_dir(const std::string &path_name)
