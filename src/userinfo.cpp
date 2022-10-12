@@ -129,7 +129,7 @@ std::string User_Info::get_dir_list(const std::string &path_name)
     struct stat content_stat;
     while ((content = readdir(dir)) != nullptr) {
         char buffer[1024] = {0};
-        std::string content_path = path + std::string(content->d_name);
+        std::string content_path = path + "/" + std::string(content->d_name);
         stat(content_path.c_str(), &content_stat);
         char mode[100] = {0}, owner[100] = {0}, group[100] = {0};
         mode_to_letters(content_stat.st_mode, mode);
