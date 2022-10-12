@@ -34,6 +34,7 @@ User_Info::User_Info()
 , data_connect_ip_("")
 , data_connect_port_(20)
 , status_(false)
+, mode_(0)
 {
     passwd *pwd = getpwnam(getlogin());
     current_dir_ = pwd == nullptr ? "" : pwd->pw_dir;
