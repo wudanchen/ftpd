@@ -35,14 +35,8 @@ private:
     void port_handle(const std::vector<std::string> &recv_buffer);
     void retr_handle(const std::vector<std::string> &recv_buffer);
     void list_handle(const std::vector<std::string> &recv_buffer);
-    void type_handle(const std::vector<std::string> &recv_buffer);
     void stor_handle(const std::vector<std::string> &recv_buffer);
     void pasv_handle(const std::vector<std::string> &recv_buffer);
-    void rnfr_handle(const std::vector<std::string> &recv_buffer);
-    void rnto_handle(const std::vector<std::string> &recv_buffer);
-    void rmd_handle(const std::vector<std::string> &recv_buffer);
-    void dele_handle(const std::vector<std::string> &recv_buffer);
-    void mkd_handle(const std::vector<std::string> &recv_buffer);
     void quit_handle(const std::vector<std::string> &recv_buffer);
     void cmd_not_implemented_handle();
     void recv_buffer_handle(const char *buff, std::vector<std::string> &recv_buffer);

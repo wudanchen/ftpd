@@ -1,6 +1,5 @@
 #include "ftpserver.h"
 #include "commandparser.h"
-// #include "threadpool.h"
 
 #include <ace/Reactor.h>
 #include <ace/Event_Handler.h>

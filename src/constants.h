@@ -9,7 +9,6 @@
  * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
  */
 #pragma once
-//已使用
 const char msg_cmd_not_implemented[]    =                         "202 COmmand not implemented, superfluous at this site.\r\n";
 const char msg_new_user[]               =                         "220 Service ready for new user\r\n";
 const char msg_user_require_pass[]      =                         "331 User name okay, need password\r\n";
