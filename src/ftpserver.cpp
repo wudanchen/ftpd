@@ -64,7 +64,7 @@ int Client_Event_Handler::handle_output(ACE_HANDLE fd)
 
 int Client_Event_Handler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask)
 {
-    ACE_DEBUG((LM_DEBUG, "current function : Read_Event_Handler::handle_close, handle : %d\n", handle));
+    ACE_DEBUG((LM_DEBUG, "Client_Event_Handler::handle_close\n", handle));
     if(handle == -1) {
         return 0;
     }
@@ -80,7 +80,6 @@ ACE_HANDLE Client_Event_Handler::get_handle(void) const
 
 void Client_Event_Handler::output_signal(const std::string &data)
 {
-    // ACE_Reactor::instance()->mask_ops(get_handle(), WRITE_MASK, ACE_Reactor::ADD_MASK);
     peer_.send(data.c_str(), data.size());
 }
 
