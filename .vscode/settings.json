@@ -56,6 +56,11 @@
         "cstring": "cpp",
         "list": "cpp",
         "codecvt": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "set": "cpp",
+        "any": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "variant": "cpp"
     }
 }

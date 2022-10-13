@@ -16,15 +16,8 @@ enable_testing()
 link_libraries(ACE pthread ftp gtest_main)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 message("path : ${PROJECT_SOURCE_DIR}")
-add_executable(
-    gtest_userinfo 
-    gtest_userinfo.cpp
-)
-
-add_executable(
-    gtest_parser 
-    gtest_commandparser.cpp
-)
+add_executable(gtest_userinfo gtest_userinfo.cpp)
+add_executable(gtest_parser gtest_commandparser.cpp)
 
 include(GoogleTest)
 gtest_discover_tests(gtest_userinfo)
