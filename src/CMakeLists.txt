@@ -18,7 +18,9 @@ endif()
 
 set(RELEASE_DIR ${PROJECT_SOURCE_DIR}/release)
 set(EXECUTABLE_OUTPUT_PATH ${RELEASE_DIR}/linux/${BuildType})
+
 add_compile_options(-fPIC)
 add_definitions(-std=c++11)
 link_libraries(ACE pthread)
 add_executable(ftpserver main.cpp ftpserver.cpp commandparser.cpp userinfo.cpp transmitter.cpp)
+add_library(ftp ftpserver.cpp commandparser.cpp userinfo.cpp transmitter.cpp)
