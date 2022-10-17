@@ -1,3 +1,6 @@
+/// \file transmitter.h
+/// \brief Processing data connection and transmission
+/// \author wudancheng
 #pragma once
 #include <ace/SOCK_Connector.h>
 #include <ace/SOCK_Acceptor.h>
@@ -12,7 +15,9 @@ public:
         ACTIVE_MODE = 0,
         PASSIVE_MODE = 1
     };
-
+    
+    /// \brief Construct a new Transmitter object
+    /// \param[in] port port number
     explicit Transmitter(uint port = 8888);
     ~Transmitter();
     int open_listen();

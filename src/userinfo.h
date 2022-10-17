@@ -1,13 +1,6 @@
-/*
- * @Author: wdc 724214532@qq.com
- * @Date: 2022-10-11 15:07:56
- * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-11 17:55:06
- * @FilePath: /ftpd/src/userinfo.h
- * @Description: 
- * 
- * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
- */
+/// \file userinfo.h
+/// \brief Store and update user information
+/// \author wudancheng
 #pragma once
 
 #include <map>
@@ -20,6 +13,12 @@ public:
 
     bool check_logged_in(const std::string &account);
     bool check_user_name(const std::string &user_name);
+
+    /// \brief check password.
+    /// \param[in] user_name user account
+    /// \param[in] passward user password
+    /// \return true succeeded
+    /// \return false failed
     bool check_password(const std::string &user_name, const std::string &passward);
     std::string get_dir_list(const std::string &path_name);
     std::string get_file_data(const std::string &path_name);
@@ -43,8 +42,8 @@ public:
 private:
     bool absolute_path(const std::string &path);
 struct Server_Info {
-    std::map<std::string, std::string> account_password_map; //已自带的账号和密码
-    std::list<std::string> logged_account;                   //已登录的用户
+    std::map<std::string, std::string> account_password_map; ///< 已自带的账号和密码
+    std::list<std::string> logged_account;                   ///< 已登录的用户
 
     Server_Info() {
         account_password_map = {
@@ -60,7 +59,7 @@ struct Server_Info {
     std::string user_;
     std::string current_dir_;
     std::string data_connect_ip_;
-    uint data_connect_port_;
-    bool status_;
-    int mode_;
+    uint data_connect_port_ = 20;
+    bool status_ = false;
+    int mode_ = 0;
 };

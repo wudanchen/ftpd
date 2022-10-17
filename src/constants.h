@@ -1,13 +1,3 @@
-/*
- * @Author: wdc 724214532@qq.com
- * @Date: 2022-10-09 14:40:12
- * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-09 14:41:50
- * @FilePath: /ftpd/src/constants.h
- * @Description: 
- * 
- * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
- */
 #pragma once
 const char msg_cmd_not_implemented[]    =                         "202 COmmand not implemented, superfluous at this site.\r\n";
 const char msg_new_user[]               =                         "220 Service ready for new user\r\n";

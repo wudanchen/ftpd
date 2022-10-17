@@ -23,6 +23,7 @@ int Transmitter::start(const User_Info &info)
     if(info.mode() == ACTIVE_MODE) {
         return connect(info.connect_ip(), info.connect_port());
     }
+
     ACE_Time_Value timeout (ACE_DEFAULT_TIMEOUT);
     return acceptor_.accept(client_stream_, nullptr, &timeout);
 }
@@ -40,9 +41,8 @@ int Transmitter::send(const std::string &data)
 
 int Transmitter::recv(std::string &data)
 {
-    while (1)
-    {
-        char buf[100] = {0};
+    char buf[1024] = {0};
+    while (true) {
         ssize_t ret = client_stream_.recv(buf, sizeof(buf));
         if(ret < 0) {
             if(ACE_ERRNO_GET == EAGAIN || ACE_ERRNO_GET == EWOULDBLOCK) {
@@ -53,8 +53,10 @@ int Transmitter::recv(std::string &data)
             ACE_DEBUG((LM_DEBUG, "connect closed.\n"));
             return -1;
         }
-        data.append(buf);
+
+        data.append(std::string(buf, buf + ret));
     }
+
     return 0;
 }
 

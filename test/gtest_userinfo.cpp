@@ -10,4 +10,3 @@ TEST(UserInfo, password) {
     EXPECT_FALSE(info.check_password("xiaoming", "haha"));
     EXPECT_FALSE(info.check_password("xiaohei", "hehe"));
 }
-

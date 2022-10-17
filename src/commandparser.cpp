@@ -1,13 +1,3 @@
-/*
- * @Author: wdc 724214532@qq.com
- * @Date: 2022-10-09 14:08:37
- * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-11 17:56:44
- * @FilePath: /ftpd/src/commandparser.cpp
- * @Description: 
- * 
- * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
- */
 #include "commandparser.h"
 #include "constants.h"
 
@@ -62,13 +52,13 @@ void Command_Parser::set_callback(const std::function<void(const std::string &)>
     output_signal_callback_ = callback;
 }
 
-
 void Command_Parser::user_handle(const std::vector<std::string> &recv_buffer)
 {
     if(recv_buffer.size() != 2) {
         send_buffer_handle(msg_login_fail);
         return;
     }
+
     if(info_.check_logged_in(recv_buffer.at(1))) {
         send_buffer_handle(msg_login_success);
     }else if(info_.check_user_name(recv_buffer.at(1))) {
@@ -85,6 +75,7 @@ void Command_Parser::pass_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_user_require_pass);
         return;
     }
+
     if(info_.check_password(info_.user(), recv_buffer.at(1))) {
         info_.set_status(true);
         send_buffer_handle(msg_login_success);
@@ -99,8 +90,9 @@ void Command_Parser::pwd_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_action_not_taken);
         return;
     }
+
     char msg[512] = {0};
-    sprintf(msg, msg_pwd_success, info_.current_dir().c_str());
+    snprintf(msg, sizeof(msg), msg_pwd_success, info_.current_dir().c_str());
     send_buffer_handle(msg);
 }
 
@@ -110,6 +102,7 @@ void Command_Parser::cwd_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_login_fail);
         return;
     }
+
     info_.update_current_dir(recv_buffer.at(1));
     send_buffer_handle(msg_file_success);
 }
@@ -126,6 +119,7 @@ void Command_Parser::port_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_syntax_error);
         return;
     }
+
     info_.set_connect_ip(spilt_str.at(0) + "." + spilt_str.at(1) + "." + spilt_str.at(2) + "." + spilt_str.at(3));
     int p1 = atoi(spilt_str.at(4).c_str());
     int p2 = atoi(spilt_str.at(5).c_str());
@@ -141,12 +135,13 @@ void Command_Parser::pasv_handle(const std::vector<std::string> &recv_buffer)
     if(transmitter_.open_listen() < 0) {
         send_buffer_handle(msg_cmd_not_implemented);
     }
+
     std::string host = transmitter_.get_addr().get_host_name();
     uint port = transmitter_.get_addr().get_port_number();
     std::replace(host.begin(), host.end(), '.', ',');
     std::string addr_str = host + "," + std::to_string(port / 256) + "," + std::to_string(port % 256);
     char msg[512] = {0};
-    sprintf(msg, msg_pasv_success, addr_str.c_str());
+    snprintf(msg, sizeof(msg), msg_pasv_success, addr_str.c_str());
     info_.set_mode(Transmitter::PASSIVE_MODE);
     send_buffer_handle(msg);
 }
@@ -159,10 +154,12 @@ void Command_Parser::list_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_syntax_error);
         return;
     }
+
     if (transmitter_.start(info_) == -1) {
         send_buffer_handle(msg_connect_fail);
         return;
     }
+
     send_buffer_handle(msg_stansfer_start, true);
     transmitter_.send(dir_list);
     send_buffer_handle(msg_file_success);
@@ -176,10 +173,12 @@ void Command_Parser::retr_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_syntax_error);
         return;
     }
+
     if(transmitter_.start(info_) == -1) {
         send_buffer_handle(msg_connect_fail);
         return;
     }
+
     send_buffer_handle(msg_stansfer_start, true);
     transmitter_.send(data);
     send_buffer_handle(msg_file_success);
@@ -192,10 +191,12 @@ void Command_Parser::stor_handle(const std::vector<std::string> &recv_buffer)
         send_buffer_handle(msg_syntax_error);
         return;
     }
+
     if(transmitter_.start(info_) == -1) {
         send_buffer_handle(msg_connect_fail);
         return;
     }
+
     send_buffer_handle(msg_stansfer_start, true);
     std::string msg("");
     transmitter_.recv(msg);
@@ -248,8 +249,10 @@ std::vector<std::string> Command_Parser::spilt(const std::string &str, const cha
             pre_it = it + 1;
         }
     }
+
     if(pre_it != str.end()) {
         result_str.push_back(std::string(pre_it, str.end()));
     }
+
     return result_str;
 }

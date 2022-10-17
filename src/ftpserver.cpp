@@ -31,7 +31,6 @@ Client_Event_Handler::Client_Event_Handler()
 
 Client_Event_Handler::~Client_Event_Handler()
 {
-
 }
 
 int Client_Event_Handler::handle_input(ACE_HANDLE fd)
@@ -47,6 +46,7 @@ int Client_Event_Handler::handle_input(ACE_HANDLE fd)
         ACE_DEBUG((LM_DEBUG, "connect closed.\n"));
         return -1;
     }
+
     //recv数据处理
     ACE_DEBUG((LM_DEBUG, "data : %s\n", buf));
     cmd_parser_.parsing_data(buf, ret);
@@ -68,6 +68,7 @@ int Client_Event_Handler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close
     if(handle == -1) {
         return 0;
     }
+
     peer_.close();
     delete this;
     return 0;
@@ -104,7 +105,6 @@ Accept_Event_Handler::Accept_Event_Handler()
 
 Accept_Event_Handler::~Accept_Event_Handler()
 {
-
 }
 //返回 0 , 在处理器方法完成后，事件处理器将保持在反应器上的登记
 //返回 <0：反应器将自动回调此事件处理器的handle_close()方法，并将它自己的内部分派表肿拆除，handle_close()
@@ -167,6 +167,7 @@ int Ftp_Server::run_loop()
         delete accept_handler;
         return -1;
     }
+
     ACE_Reactor::instance()->register_handler(accept_handler, ACE_Event_Handler::ACCEPT_MASK);
     return ACE_Reactor::instance()->run_reactor_event_loop();
 }

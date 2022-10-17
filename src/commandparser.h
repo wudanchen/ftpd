@@ -1,13 +1,6 @@
-/*
- * @Author: wdc 724214532@qq.com
- * @Date: 2022-10-09 15:01:45
- * @LastEditors: wdc 724214532@qq.com
- * @LastEditTime: 2022-10-10 15:37:14
- * @FilePath: /ftpd/src/commandparser.h
- * @Description: 
- * 
- * Copyright (c) 2022 by wdc 724214532@qq.com, All Rights Reserved. 
- */
+/// \file commandparser.h
+/// \brief Parse the received command
+/// \author wudancheng
 #pragma once
 #include "userinfo.h"
 #include "transmitter.h"
@@ -22,8 +15,18 @@ public:
 
     Command_Parser();
     ~Command_Parser() {}
+
+    /// \brief farsing ftp cmmmand.
+    /// \param[in] buf revice data
+    /// \param[in] len data len
+    
     void parsing_data(const char *buf, int len);
+    /// \brief response reply
+    /// \return const char* string code
     const char *response_data() const;
+    
+    /// \brief Set the send callback
+    /// \param[] callback 
     void set_callback(const std::function<void(const std::string &)> &callback);
 
 private:
